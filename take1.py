@@ -43,3 +43,22 @@ print(outlierIndexes)
 print('--- Observations found as outlier -----')
 print(df[ distances > cutoff , :])
 # [[115.  79.], [135.  84.], [122.  89.], [168.  81.]]
+
+## Finding ellipse dimensions 
+pearson = cov[0, 1]/np.sqrt(cov[0, 0] * cov[1, 1])
+ell_radius_x = np.sqrt(1 + pearson)
+ell_radius_y = np.sqrt(1 - pearson)
+lambda_, v = np.linalg.eig(cov)
+lambda_ = np.sqrt(lambda_)
+
+# Ellipse patch
+ellipse = patches.Ellipse(xy=(centerpoint[0], centerpoint[1]),
+                  width=lambda_[0]*np.sqrt(cutoff)*2, height=lambda_[1]*np.sqrt(cutoff)*2,
+                  angle=np.rad2deg(np.arccos(v[0, 0])), edgecolor='#fab1a0')
+ellipse.set_facecolor('#0984e3')
+ellipse.set_alpha(0.5)
+fig = plt.figure()
+ax = plt.subplot()
+ax.add_artist(ellipse)
+plt.scatter(df[: , 0], df[ : , 1])
+plt.show()
