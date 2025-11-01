@@ -14,7 +14,7 @@ class MahalanobisOutlierDetector:
     def load_and_prepare_data(self, file_path='HW2023.csv'):
         self.df = pd.read_csv(file_path, sep=",", decimal='.')
         
-        #DATE column for reference
+        #categorical column for reference
         if 'date' in self.df.columns:
             self.dates = self.df['date'].copy()
         
@@ -22,10 +22,8 @@ class MahalanobisOutlierDetector:
         self.numeric_columns = ['temp_max', 'humidity', 'visibility', 'cloudiness', 'wind_speed', 'rain']
         self.df_analysis = self.df[self.numeric_columns].copy()
         
-        # Handle missing values in rain
+        # Handle missing values
         self.df_analysis['rain'] = self.df_analysis['rain'].fillna(0)
-        
-        # Remove any remaining rows with missing values
         self.df_analysis = self.df_analysis.dropna()
         
         return self.df_analysis
@@ -147,53 +145,29 @@ class MahalanobisOutlierDetector:
             print(f"{bottom_date} (OLS: {bottom_row['OLS']:.4f})")
     
     def save_results(self, results):
-        """Save the three augmented datasets with OLS columns"""
         for config_name, config_data in results.items():
             df = config_data['df']
             filename = f"HW2023_OLS_{config_name}.csv"
             df.to_csv(filename, index=False)
-            print(f"Saved: {filename}")
 
 def main():
-    """Main function to run the complete analysis"""
-    # Initialize detector
+    #detector
     detector = MahalanobisOutlierDetector()
     
     # Load and prepare data
-    print("Loading and preparing Houston 2023 weather data...")
     df = detector.load_and_prepare_data('HW2023.csv')
     
     # Calculate Mahalanobis components
-    print("\nCalculating Mahalanobis distance components...")
     detector.calculate_mahalanobis_components()
     
     # Apply detection technique with 3 configurations
-    print("\nApplying Mahalanobis distance with 3 hyperparameter settings...")
     results = detector.apply_detection_technique()
     
     # Analyze results
-    print("\nAnalyzing top and bottom OLS scores...")
     detector.analyze_results(results)
     
-    # Visualize results
-    print("\nCreating visualizations...")
-    detector.visualize_results(results)
-    
-    # Assess performance
-    print("\nAssessing technique performance...")
-    detector.assess_performance(results)
-    
     # Save results
-    print("\nSaving augmented datasets...")
     detector.save_results(results)
-    
-    print("\n" + "="*60)
-    print("ANALYSIS COMPLETE!")
-    print("="*60)
-    print("Three augmented datasets saved with OLS columns:")
-    print("1. HW2023_OLS_config1.csv - Centroid distance")
-    print("2. HW2023_OLS_config2.csv - Neighbor average distance") 
-    print("3. HW2023_OLS_config3.csv - Robust weighted combination")
 
 if __name__ == "__main__":
     main()
