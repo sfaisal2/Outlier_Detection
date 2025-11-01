@@ -147,8 +147,9 @@ class MahalanobisOutlierDetector:
     def save_results(self, results):
         for config_name, config_data in results.items():
             df = config_data['df']
+            df_sorted = df.sort_values('OLS', ascending=False)
             filename = f"HW2023_OLS_{config_name}.csv"
-            df.to_csv(filename, index=False)
+            df_sorted.to_csv(filename, index=False)
 
 def main():
     #detector
